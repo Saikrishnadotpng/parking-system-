@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="app-container" id="login-container">
+        <div class="glass-panel login-panel">
+            <h2>Admin Login</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Username (e.g., SAI KRISHNA)</label>
+                    <input type="text" id="username" placeholder="SAI KRISHNA" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="12345" required>
+                </div>
+                <button type="submit" class="btn primary-btn">Login</button>
+                <div class="error-msg" id="login-error"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="app-container hidden" id="dashboard-container">
+        <header class="admin-header">
+            <div>
+                <h1>Smart<span class="highlight">Park</span> Admin</h1>
+                <p>Logged in as: <span id="admin-name" class="highlight"></span></p>
+            </div>
+            <button class="btn logout-btn" id="logout-btn">Logout</button>
+        </header>
+
+        <div class="admin-data-container">
+            <h2>Live Slot Data</h2>
+            <button class="btn refresh-btn" id="refresh-btn">🔄 Refresh Data</button>
+            <div class="table-wrapper">
+                <table class="glass-table">
+                    <thead>
+                        <tr>
+                            <th>Slot ID</th>
+                            <th>Status</th>
+                            <th>Booked By</th>
+                            <th>Phone / User ID</th>
+                            <th>Vehicle No</th>
+                            <th>Check-In Code</th>
+                            <th>Duration (Mins)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-slots-body">
+                        <!-- Data rows here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <h1>Smart<span class="highlight">Park</span></h1>
+            <p>Real-time Smart Parking Prototype</p>
+            <div id="availability-summary" class="summary-badge">Fetching live slots...</div>
+            <br>
+            <button class="btn" id="open-cancel-btn" style="margin-top:1rem; background:transparent; border:1px solid rgba(255,255,255,0.2); color:var(--text-secondary); padding:0.5rem 1rem; border-radius:20px; cursor:pointer; font-size:0.85rem; transition:0.3s;">Manage / Cancel Booking</button>
+        </header>
+
+        <div class="status-legend">
+            <div class="legend-item"><div class="dot available"></div> Available</div>
+            <div class="legend-item"><div class="dot booked"></div> Booked</div>
+            <div class="legend-item"><div class="dot occupied"></div> Occupied</div>
+        </div>
+
+        <main class="slots-container" id="slots-container">
+            <!-- Slots will be dynamically rendered here -->
+            <div class="loader">Loading slots...</div>
+        </main>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay" id="booking-modal">
+        <div class="modal glass-panel">
+            <button class="close-btn" id="close-booking">&times;</button>
+            <h2>Book Slot <span id="selected-slot-id"></span></h2>
+            <form id="booking-form">
+                <div class="input-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="John Doe" required>
+                </div>
+                <div class="input-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" placeholder="1234567890" required>
+                </div>
+                <div class="input-group">
+                    <label for="vehicle">Vehicle Number</label>
+                    <input type="text" id="vehicle" placeholder="KA-01-AB-1234" required>
+                </div>
+                <button type="submit" class="btn primary-btn" id="request-otp-btn">Request OTP</button>
+            </form>
+            <div class="error-msg" id="booking-error"></div>
+        </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div class="modal-overlay" id="otp-modal">
+        <div class="modal glass-panel">
+            <button class="close-btn" id="close-otp">&times;</button>
+            <h2>OTP Verification</h2>
+            <p class="subtitle">Enter the 4-digit code. (Check terminal output for mock OTP)</p>
+            <form id="otp-form">
+                <div class="otp-inputs">
+                    <input type="text" maxlength="1" class="otp-digit" required>
+                    <input type="text" maxlength="1" class="otp-digit" required>
+                    <input type="text" maxlength="1" class="otp-digit" required>
+                    <input type="text" maxlength="1" class="otp-digit" required>
+                </div>
+                <button type="submit" class="btn primary-btn" id="verify-otp-btn">Verify & Book</button>
+            </form>
+            <div class="error-msg" id="otp-error"></div>
+        </div>
+    </div>
+
+    <!-- Success Feedback Overlay -->
+    <div class="success-overlay" id="success-overlay">
+        <div class="success-content">
+            <div class="check-icon">✓</div>
+            <h2>Booking Confirmed!</h2>
+            <p>Your slot is securely reserved.</p>
+            <div class="checkin-code-box" style="margin-top:1.5rem; background:rgba(0,0,0,0.3); padding:1rem; border-radius:12px; border:1px dashed var(--color-available);">
+                <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:0.5rem;">Staff Check-In Code</p>
+                <h3 id="display-checkin-code" style="font-size:2.5rem; letter-spacing:5px; margin:0;">----</h3>
+            </div>
+            <button class="btn primary-btn" id="close-success-btn" style="margin-top:2rem;">Close</button>
+        </div>
+    </div>
+
+    <!-- Cancel Modal -->
+    <div class="modal-overlay" id="cancel-modal">
+        <div class="modal glass-panel">
+            <button class="close-btn" id="close-cancel">&times;</button>
+            <h2 style="color:var(--color-occupied);">Cancel Booking</h2>
+            <p class="subtitle">Enter your registered phone number to release your slot.</p>
+            <form id="cancel-form">
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="cancel-phone" placeholder="1234567890" required>
+                </div>
+                <button type="submit" class="btn" style="width:100%; background:var(--color-occupied); border:none; color:white; padding:1rem; border-radius:12px; font-weight:600; cursor:pointer;" id="cancel-submit-btn">Cancel Booking</button>
+            </form>
+            <div class="error-msg" id="cancel-error"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
