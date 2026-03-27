@@ -111,7 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const elapsedMins = slot.bookingTime ? Math.floor((Date.now() - slot.bookingTime) / 60000) : 0;
             const elapsedDisplay = slot.bookingTime ? `${elapsedMins}m` : '-';
-            const timeBadge = (elapsedMins >= 5) ? `<span style="color:#f85149; font-weight:bold;">${elapsedDisplay} (OVERDUE)</span>` : `<span class="null-data">${elapsedDisplay}</span>`;
+            
+            // To test locally and gracefully demonstrate visually, duration in hours matches test minutes (e.g. 2 hours = 2 minutes until warning)
+            const dynamicLimit = slot.durationHours ? slot.durationHours : 1;
+            
+            const timeBadge = (elapsedMins >= dynamicLimit && slot.bookingTime) ? `<span style="color:#f85149; font-weight:bold;">${elapsedDisplay} (OVERDUE)</span>` : `<span class="null-data">${elapsedDisplay}</span>`;
+
+            const formatArrival = slot.arrivalTime ? `<strong>${slot.arrivalTime}</strong>` : `<span class="null-data">-</span>`;
+            const formatDuration = slot.durationHours ? `<strong>${slot.durationHours} Hr(s)</strong>` : `<span class="null-data">-</span>`;
 
             tr.innerHTML = `
                 <td><strong>0${slot.id}</strong></td>
@@ -119,6 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${slot.bookedBy || '<span class="null-data">-</span>'}</td>
                 <td>${slot.phone || '<span class="null-data">-</span>'}</td>
                 <td>${slot.vehicleInfo || '<span class="null-data">-</span>'}</td>
+                <td>${formatArrival}</td>
+                <td>${formatDuration}</td>
                 <td><strong style="color:var(--color-primary); letter-spacing: 2px;">${slot.checkInCode || '-'}</strong></td>
                 <td>${timeBadge}</td>
                 <td>

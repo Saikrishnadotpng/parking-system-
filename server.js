@@ -30,9 +30,9 @@ const ADMIN_USERS = [
 
 // In-memory state for 3 parking slots
 let slots = [
-  { id: 1, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false },
-  { id: 2, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false },
-  { id: 3, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false }
+  { id: 1, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null },
+  { id: 2, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null },
+  { id: 3, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null }
 ];
 
 let pendingOtps = {};
@@ -48,9 +48,9 @@ app.get('/api/slots', (req, res) => {
 
 // 2. Request OTP for booking
 app.post('/api/book/request-otp', async (req, res) => {
-  const { slotId, name, phone, vehicleNumber } = req.body;
+  const { slotId, name, phone, vehicleNumber, arrivalTime, durationHours } = req.body;
   
-  if (!slotId || !name || !phone || !vehicleNumber) {
+  if (!slotId || !name || !phone || !vehicleNumber || !arrivalTime || !durationHours) {
     return res.status(400).json({ success: false, message: 'All fields are required.' });
   }
 
@@ -70,7 +70,9 @@ app.post('/api/book/request-otp', async (req, res) => {
     slotId: parseInt(slotId),
     name,
     phone,
-    vehicleNumber
+    vehicleNumber,
+    arrivalTime,
+    durationHours: parseInt(durationHours)
   };
 
   if (twilioClient) {
@@ -116,6 +118,8 @@ app.post('/api/book/verify-otp', (req, res) => {
   slot.phone = pending.phone;
   slot.vehicleInfo = pending.vehicleNumber;
   slot.checkInCode = checkInCode;
+  slot.arrivalTime = pending.arrivalTime;
+  slot.durationHours = pending.durationHours;
   slot.bookingTime = Date.now();
   slot.warningSent = false;
 
@@ -141,6 +145,8 @@ app.post('/api/esp32/update', (req, res) => {
       slot.checkInCode = null;
       slot.bookingTime = null;
       slot.warningSent = false;
+      slot.arrivalTime = null;
+      slot.durationHours = null;
     }
     console.log(`[ESP32 SYNC] Slot ${slotId} status updated to ${status}`);
     res.json({ success: true, message: 'Slot updated from ESP32.' });
@@ -175,16 +181,20 @@ app.get('/api/admin/slots', (req, res) => {
     res.json({ success: true, data: slots });
 });
 
-// Periodic background check for 2-hour expiry limit
+// Periodic background check for dynamic customized expiry limits
 setInterval(async () => {
-    // 5 minutes in milliseconds for rapid prototype testing
-    const TIME_LIMIT_MS = 5 * 60 * 1000; 
+    // Note: To make local prototype testing viable, 1 selected 'Hour' = 1 Minute of real time checking here!
+    // Ex: Selecting '2 Hours' duration means the warning SMS sends after 2 real-life minutes.
     
     for (const slot of slots) {
         if ((slot.status === 'booked' || slot.status === 'occupied') && slot.bookingTime && !slot.warningSent) {
-            if (Date.now() - slot.bookingTime > TIME_LIMIT_MS) {
+            
+            const durationMs = (slot.durationHours ? slot.durationHours : 1) * 60 * 1000; 
+
+            if (Date.now() - slot.bookingTime > durationMs) {
                 slot.warningSent = true;
-                const messageBody = `SmartPark Alert: Your 5-minute parking limit for Slot ${slot.id} has expired. If you continue parking, extra fees will be collected.`;
+                const durationLabel = slot.durationHours ? `${slot.durationHours}-hour` : `1-hour`;
+                const messageBody = `SmartPark Alert: Your ${durationLabel} parking limit for Slot ${slot.id} has expired. Extra fees apply.`;
                 
                 if (twilioClient && slot.phone) {
                     try {
@@ -248,6 +258,8 @@ app.post('/api/book/cancel', (req, res) => {
     slot.checkInCode = null;
     slot.bookingTime = null;
     slot.warningSent = false;
+    slot.arrivalTime = null;
+    slot.durationHours = null;
 
     console.log(`[USER CANCELLATION] Booking for ${phone} cancelled.`);
     res.json({ success: true, message: 'Booking cancelled successfully.' });

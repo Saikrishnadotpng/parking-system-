@@ -126,6 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = document.getElementById('name').value;
         const phone = document.getElementById('phone').value;
         const vehicleNumber = document.getElementById('vehicle').value;
+        const arrivalTime = document.getElementById('arrival-time').value;
+        const durationHours = document.getElementById('duration').value;
         
         reqOtpBtn.disabled = true;
         reqOtpBtn.textContent = 'Sending...';
@@ -134,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`${API_BASE}/book/request-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ slotId: currentSlot, name, phone, vehicleNumber })
+                body: JSON.stringify({ slotId: currentSlot, name, phone, vehicleNumber, arrivalTime, durationHours })
             });
             const data = await res.json();
             
