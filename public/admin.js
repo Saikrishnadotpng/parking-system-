@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = '/api';
+    const API_BASE = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '3000' ? 'http://localhost:3000/api' : '/api';
     
     const loginContainer = document.getElementById('login-container');
     const dashboardContainer = document.getElementById('dashboard-container');
@@ -117,17 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const timeBadge = (elapsedMins >= dynamicLimit && slot.bookingTime) ? `<span style="color:#f85149; font-weight:bold;">${elapsedDisplay} (OVERDUE)</span>` : `<span class="null-data">${elapsedDisplay}</span>`;
 
-            const formatArrival = slot.arrivalTime ? `<strong>${slot.arrivalTime}</strong>` : `<span class="null-data">-</span>`;
-            const formatDuration = slot.durationHours ? `<strong>${slot.durationHours} Hr(s)</strong>` : `<span class="null-data">-</span>`;
+            const formatArrival = slot.arrivalTime ? `<strong>${slot.arrivalTime}</strong>` : '';
+            const formatDuration = slot.durationHours ? `(${slot.durationHours} Hr)` : '';
+            const scheduleDisplay = formatArrival ? `${formatArrival} ${formatDuration}` : `<span class="null-data">-</span>`;
+            
+            const guestInfo = slot.bookedBy ? `<strong>${slot.bookedBy}</strong><br><small style="color:var(--text-secondary)">${slot.phone}</small>` : `<span class="null-data">-</span>`;
 
             tr.innerHTML = `
                 <td><strong>0${slot.id}</strong></td>
                 <td><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
-                <td>${slot.bookedBy || '<span class="null-data">-</span>'}</td>
-                <td>${slot.phone || '<span class="null-data">-</span>'}</td>
+                <td>${guestInfo}</td>
                 <td>${slot.vehicleInfo || '<span class="null-data">-</span>'}</td>
-                <td>${formatArrival}</td>
-                <td>${formatDuration}</td>
+                <td>${scheduleDisplay}</td>
                 <td><strong style="color:var(--color-primary); letter-spacing: 2px;">${slot.checkInCode || '-'}</strong></td>
                 <td>${timeBadge}</td>
                 <td>

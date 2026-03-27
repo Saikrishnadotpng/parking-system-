@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = '/api';
+    const API_BASE = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '3000' ? 'http://localhost:3000/api' : '/api';
     const slotsContainer = document.getElementById('slots-container');
     
     // Modals

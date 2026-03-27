@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = '/api';
+    const API_BASE = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '3000' ? 'http://localhost:3000/api' : '/api';
     const form = document.getElementById('checkin-form');
     const errorDiv = document.getElementById('checkin-error');
     const successDiv = document.getElementById('checkin-success');
