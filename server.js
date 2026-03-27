@@ -287,6 +287,10 @@ app.post('/api/admin/free-slot', (req, res) => {
     slot.phone = null;
     slot.vehicleInfo = null;
     slot.checkInCode = null;
+    slot.bookingTime = null;
+    slot.warningSent = false;
+    slot.arrivalTime = null;
+    slot.durationHours = null;
 
     console.log(`[ADMIN CANCELLATION] Slot ${slotId} force freed by Admin.`);
     res.json({ success: true, message: 'Slot successfully freed.' });

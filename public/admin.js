@@ -109,19 +109,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusClass = `status-${slot.status}`;
             const statusDisplay = slot.status.charAt(0).toUpperCase() + slot.status.slice(1);
             
-            const elapsedMins = slot.bookingTime ? Math.floor((Date.now() - slot.bookingTime) / 60000) : 0;
-            const elapsedDisplay = slot.bookingTime ? `${elapsedMins}m` : '-';
+            const isActive = slot.status !== 'available';
+            const elapsedMins = (isActive && slot.bookingTime) ? Math.floor((Date.now() - slot.bookingTime) / 60000) : 0;
+            const elapsedDisplay = (isActive && slot.bookingTime) ? `${elapsedMins}m` : '-';
             
-            // To test locally and gracefully demonstrate visually, duration in hours matches test minutes (e.g. 2 hours = 2 minutes until warning)
+            // To test locally and gracefully demonstrate visually, duration in hours matches test minutes
             const dynamicLimit = slot.durationHours ? slot.durationHours : 1;
             
-            const timeBadge = (elapsedMins >= dynamicLimit && slot.bookingTime) ? `<span style="color:#f85149; font-weight:bold;">${elapsedDisplay} (OVERDUE)</span>` : `<span class="null-data">${elapsedDisplay}</span>`;
+            const timeBadge = (isActive && elapsedMins >= dynamicLimit && slot.bookingTime) ? `<span style="color:#f85149; font-weight:bold;">${elapsedDisplay} (OVERDUE)</span>` : `<span class="null-data">${elapsedDisplay}</span>`;
 
-            const formatArrival = slot.arrivalTime ? `<strong>${slot.arrivalTime}</strong>` : '';
-            const formatDuration = slot.durationHours ? `(${slot.durationHours} Hr)` : '';
+            const formatArrival = (isActive && slot.arrivalTime) ? `<strong>${slot.arrivalTime}</strong>` : '';
+            const formatDuration = (isActive && slot.durationHours) ? `(${slot.durationHours} Hr)` : '';
             const scheduleDisplay = formatArrival ? `${formatArrival} ${formatDuration}` : `<span class="null-data">-</span>`;
             
-            const guestInfo = slot.bookedBy ? `<strong>${slot.bookedBy}</strong><br><small style="color:var(--text-secondary)">${slot.phone}</small>` : `<span class="null-data">-</span>`;
+            const guestInfo = (isActive && slot.bookedBy) ? `<strong>${slot.bookedBy}</strong><br><small style="color:var(--text-secondary)">${slot.phone}</small>` : `<span class="null-data">-</span>`;
 
             tr.innerHTML = `
                 <td><strong>0${slot.id}</strong></td>
