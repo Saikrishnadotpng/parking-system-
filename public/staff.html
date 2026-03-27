@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark Staff Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css"> <!-- Reusing admin styles for the panel format -->
+</head>
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    
+    <div class="app-container">
+        <div class="glass-panel login-panel" style="max-width: 450px;">
+            <h2>Staff Check-In</h2>
+            <p style="color:var(--text-secondary); text-align:center; margin-top:-1rem; margin-bottom:2rem;">Verify user arrival natively.</p>
+            <form id="checkin-form">
+                <div class="input-group">
+                    <label>Slot Number</label>
+                    <input type="number" id="slot-id" placeholder="1" min="1" required>
+                </div>
+                <div class="input-group">
+                    <label>4-Digit Check-In Code</label>
+                    <input type="text" id="checkin-code" placeholder="1234" maxlength="4" required>
+                </div>
+                <button type="submit" class="btn primary-btn">Verify Access</button>
+                <div class="error-msg" id="checkin-error"></div>
+                <div id="checkin-success" style="color:var(--color-available); text-align:center; margin-top:1rem; font-weight:600; display:block; min-height:20px;"></div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="staff.js"></script>
+</body>
+</html>

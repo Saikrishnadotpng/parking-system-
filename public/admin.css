@@ -1,0 +1,126 @@
+/* Inherits base styles from style.css */
+.hidden {
+    display: none !important;
+}
+
+.login-panel {
+    margin: 100px auto;
+    width: 100%;
+    max-width: 400px;
+    padding: 3rem;
+}
+
+.login-panel h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.admin-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.logout-btn {
+    background: rgba(248, 81, 73, 0.2);
+    color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.4);
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    background: rgba(248, 81, 73, 0.4);
+}
+
+.admin-data-container {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+    backdrop-filter: blur(16px);
+    position: relative;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.admin-data-container h2 {
+    margin-bottom: 1.5rem;
+    font-family: 'Outfit', sans-serif;
+    display: inline-block;
+}
+
+.refresh-btn {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: rgba(88, 166, 255, 0.2);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+    background: var(--color-primary);
+    color: white;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.glass-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.glass-table th, .glass-table td {
+    padding: 1.2rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.glass-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.glass-table tr:hover td {
+    background: rgba(255,255,255,0.03);
+}
+
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-available { background: rgba(46, 160, 67, 0.2); color: var(--color-available); }
+.status-booked { background: rgba(240, 136, 62, 0.2); color: var(--color-booked); }
+.status-occupied { background: rgba(248, 81, 73, 0.2); color: var(--color-occupied); }
+
+.null-data {
+    color: var(--text-secondary);
+    font-style: italic;
+}
