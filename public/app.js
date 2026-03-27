@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = 'http://localhost:3000/api';
+    const API_BASE = '/api';
     const slotsContainer = document.getElementById('slots-container');
     
     // Modals
