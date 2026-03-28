@@ -41,7 +41,7 @@ let pendingOtps = {};
 app.get('/api/slots', (req, res) => {
   res.json(slots.map(s => ({
     id: s.id,
-    status: s.status,
+    status: s.physicalPresence ? 'occupied' : s.status,
     vehicleInfo: s.vehicleInfo ? 'HIDDEN' : null // Omit PII for public UX
   })));
 });
@@ -185,8 +185,13 @@ app.get('/api/admin/slots', (req, res) => {
         return res.status(403).json({ success: false, message: 'Unauthorized. Admin access required.' });
     }
 
-    // Return the full slots array including PII
-    res.json({ success: true, data: slots });
+    // Return the full slots array, dynamically overriding status for physically blocked spots
+    const adminData = slots.map(s => ({
+        ...s,
+        status: s.physicalPresence ? 'occupied' : s.status
+    }));
+    
+    res.json({ success: true, data: adminData });
 });
 
 // Periodic background check for dynamic customized expiry limits
