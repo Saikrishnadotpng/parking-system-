@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch and render slots periodically
     async function fetchSlots() {
         try {
-            const res = await fetch(`${API_BASE}/slots`);
+            const res = await fetch(`${API_BASE}/slots?_t=${new Date().getTime()}`, { cache: 'no-store' });
             const slots = await res.json();
             renderSlots(slots);
         } catch (error) {

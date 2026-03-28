@@ -77,8 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshBtn.textContent = 'Refreshing...';
         
         try {
-            const res = await fetch(`${API_BASE}/admin/slots`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const res = await fetch(`${API_BASE}/admin/slots?_t=${Date.now()}`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+                cache: 'no-store'
             });
             const data = await res.json();
             
