@@ -92,7 +92,7 @@ app.post('/api/book/request-otp', async (req, res) => {
       }
   } else {
       console.log(`[MOCK SMS] OTP for ${name} (${phone}) to book Slot ${slotId} is: ${mockOtp}`);
-      res.json({ success: true, message: 'OTP sent successfully. Check server console for mock OTP.' });
+      res.json({ success: true, message: 'OTP sent successfully.', mockOtp: mockOtp });
   }
 });
 

@@ -144,6 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUserPhone = phone;
                 bookingModal.classList.remove('active');
                 openOtpModal();
+                if (data.mockOtp) {
+                    alert(`[PROTOTYPE MOCK SMS]\n\nYour OTP is: ${data.mockOtp}\n\n(In production, this would be an actual SMS sent to your phone)`);
+                }
             } else {
                 bookingError.textContent = data.message;
             }
