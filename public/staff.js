@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         errorDiv.textContent = '';
         successDiv.textContent = '';
         
-        const checkInCode = document.getElementById('checkin-code').value;
+        const checkInCode = document.getElementById('checkin-code').value.trim();
 
         btn.disabled = true;
         btn.textContent = 'Verifying...';
