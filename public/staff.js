@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Hardcoded production URL for standalone Staff Portal connecting to active Render Database
-    const API_BASE = 'https://parking-system-11se.onrender.com/api';
+    const API_BASE = 'https://parking-system-1-w3d5.onrender.com/api';
     const form = document.getElementById('checkin-form');
     const errorDiv = document.getElementById('checkin-error');
     const successDiv = document.getElementById('checkin-success');
