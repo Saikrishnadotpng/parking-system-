@@ -30,9 +30,9 @@ const ADMIN_USERS = [
 
 // In-memory state for 3 parking slots
 let slots = [
-  { id: 1, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null },
-  { id: 2, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null },
-  { id: 3, status: 'available', bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null }
+  { id: 1, status: 'available', physicalPresence: false, bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null },
+  { id: 2, status: 'available', physicalPresence: false, bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null },
+  { id: 3, status: 'available', physicalPresence: false, bookedBy: null, phone: null, vehicleInfo: null, checkInCode: null, bookingTime: null, warningSent: false, arrivalTime: null, durationHours: null }
 ];
 
 let pendingOtps = {};
@@ -128,17 +128,25 @@ app.post('/api/book/verify-otp', (req, res) => {
   res.json({ success: true, message: 'Booking confirmed successfully!', checkInCode: checkInCode, slotId: slot.id });
 });
 
-// 4. ESP32 Update API 
+// 4. ESP32 Update API (Physical Sensor Data)
 app.post('/api/esp32/update', (req, res) => {
-  const { slotId, status } = req.body;
-  if (!slotId || !['available', 'occupied', 'booked'].includes(status)) {
-    return res.status(400).json({ success: false, message: 'Invalid data.' });
+  const { slotId, presence } = req.body;
+
+  if (!slotId || typeof presence !== 'boolean') {
+    return res.status(400).json({ success: false, message: 'Requires slotId and boolean presence.' });
   }
 
   const slot = slots.find(s => s.id === parseInt(slotId));
   if (slot) {
-    slot.status = status;
-    if (status === 'available') {
+    slot.physicalPresence = presence;
+    const pState = presence ? 'CAR PRESENT' : 'EMPTY';
+    console.log(`[ESP32 SYNC] Sensor for Slot ${slotId} is reporting: ${pState}`);
+    
+    // Auto-free slot physically if status was 'occupied' AND 
+    // the car leaves (presence becomes false)
+    if (!presence && slot.status === 'occupied') {
+      console.log(`[SYSTEM] Car left Slot ${slotId}. Freeing slot.`);
+      slot.status = 'available';
       slot.bookedBy = null;
       slot.phone = null;
       slot.vehicleInfo = null;
@@ -148,8 +156,8 @@ app.post('/api/esp32/update', (req, res) => {
       slot.arrivalTime = null;
       slot.durationHours = null;
     }
-    console.log(`[ESP32 SYNC] Slot ${slotId} status updated to ${status}`);
-    res.json({ success: true, message: 'Slot updated from ESP32.' });
+    
+    res.json({ success: true, message: `Sensor for slot ${slotId} updated.`, data: { slotId, presence } });
   } else {
     res.status(404).json({ success: false, message: 'Slot not found' });
   }
@@ -216,29 +224,58 @@ setInterval(async () => {
     }
 }, 60000); // Check every 60 seconds
 
-// Customer Verify Check-In API (Dynamic Assignment)
+// Customer Verify Check-In API (Dynamic Fast-Reassignment)
 app.post('/api/staff/verify-checkin', (req, res) => {
     const { checkInCode } = req.body;
-    if (!checkInCode) {
-        return res.status(400).json({ success: false, message: 'Check-In Code is required.' });
-    }
+    if (!checkInCode) return res.status(400).json({ success: false, message: 'Check-In Code is required.' });
 
-    // Find the slot by the user's secret check-in code
-    const slot = slots.find(s => s.checkInCode === checkInCode.toString());
+    // 1. Find the user's originally booked slot
+    let slot = slots.find(s => s.checkInCode === checkInCode.toString());
     
-    if (!slot) {
-        return res.status(400).json({ success: false, message: 'Invalid Check-In Code.' });
+    if (!slot) return res.status(400).json({ success: false, message: 'Invalid Check-In Code.' });
+    if (slot.status !== 'booked') return res.status(400).json({ success: false, message: 'Booking no longer valid.' });
+
+    // 2. Dynamic Physical Check: Is their booked slot physically occupied by someone else?
+    if (slot.physicalPresence === true) {
+        console.log(`[ALERT] User's Slot ${slot.id} is physically blocked. Searching for free slot...`);
+        // Find ANY slot that is virtually 'available' AND physically empty (false)
+        let freeSlot = slots.find(s => s.status === 'available' && !s.physicalPresence);
+        
+        if (!freeSlot) {
+            return res.status(400).json({ success: false, message: 'Parking is completely physically full! Please see staff.' });
+        }
+        
+        // 3. Reassign Booking to new free slot
+        console.log(`[REASSIGN] Moving User to Slot ${freeSlot.id}`);
+        freeSlot.status = 'booked';
+        freeSlot.physicalPresence = false; // They haven't parked yet technically
+        freeSlot.bookedBy = slot.bookedBy;
+        freeSlot.phone = slot.phone;
+        freeSlot.vehicleInfo = slot.vehicleInfo;
+        freeSlot.bookingTime = slot.bookingTime;
+        freeSlot.arrivalTime = slot.arrivalTime;
+        freeSlot.durationHours = slot.durationHours;
+        
+        // Free up the squatted/original slot virtual assignment
+        slot.status = 'available'; // Even if squatted physically, it's virtually available now.
+        slot.bookedBy = null;
+        slot.phone = null;
+        slot.vehicleInfo = null;
+        slot.checkInCode = null;
+        slot.bookingTime = null;
+        slot.warningSent = false;
+        slot.arrivalTime = null;
+        slot.durationHours = null;
+        
+        // Now point our 'slot' reference to the new Free slot
+        slot = freeSlot;
     }
 
-    if (slot.status !== 'booked') {
-        return res.status(400).json({ success: false, message: 'This booking is no longer valid or already checked in.' });
-    }
-
-    // Transition from 'booked' to 'occupied'
+    // 4. Mark official arrival
     slot.status = 'occupied';
-    slot.checkInCode = null; // Clear code so it can't be reused
-    console.log(`[CUSTOMER CHECK-IN] Code verified! User assigned to Slot ${slot.id}.`);
+    slot.checkInCode = null; // Clear code so it can't be reused over and over
 
+    console.log(`[CUSTOMER CHECK-IN] Code verified! User assigned physically to Slot ${slot.id}.`);
     res.json({ 
         success: true, 
         message: `Check-In verified! Please proceed to park in Slot ${slot.id}.`,
