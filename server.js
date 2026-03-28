@@ -216,30 +216,34 @@ setInterval(async () => {
     }
 }, 60000); // Check every 60 seconds
 
-// Staff Verify Check-In API
+// Customer Verify Check-In API (Dynamic Assignment)
 app.post('/api/staff/verify-checkin', (req, res) => {
-    const { slotId, checkInCode } = req.body;
-    if (!slotId || !checkInCode) {
-        return res.status(400).json({ success: false, message: 'Slot ID and Check-In Code are required.' });
+    const { checkInCode } = req.body;
+    if (!checkInCode) {
+        return res.status(400).json({ success: false, message: 'Check-In Code is required.' });
     }
 
-    const slot = slots.find(s => s.id === parseInt(slotId));
-    if (!slot) return res.status(404).json({ success: false, message: 'Slot not found.' });
+    // Find the slot by the user's secret check-in code
+    const slot = slots.find(s => s.checkInCode === checkInCode.toString());
+    
+    if (!slot) {
+        return res.status(400).json({ success: false, message: 'Invalid Check-In Code.' });
+    }
 
     if (slot.status !== 'booked') {
-        return res.status(400).json({ success: false, message: 'Slot is not currently booked.' });
-    }
-
-    if (slot.checkInCode !== checkInCode.toString()) {
-        return res.status(400).json({ success: false, message: 'Invalid Check-In Code.' });
+        return res.status(400).json({ success: false, message: 'This booking is no longer valid or already checked in.' });
     }
 
     // Transition from 'booked' to 'occupied'
     slot.status = 'occupied';
     slot.checkInCode = null; // Clear code so it can't be reused
-    console.log(`[STAFF CHECK-IN] Slot ${slotId} verified and is now physically occupied.`);
+    console.log(`[CUSTOMER CHECK-IN] Code verified! User assigned to Slot ${slot.id}.`);
 
-    res.json({ success: true, message: 'Check-In verified! Slot is now physically occupied.' });
+    res.json({ 
+        success: true, 
+        message: `Check-In verified! Please proceed to park in Slot ${slot.id}.`,
+        assignedSlot: slot.id
+    });
 });
 
 // User Cancel API

@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== '3000' ? 'http://localhost:3000/api' : '/api';
+    // Hardcoded production URL for standalone Staff Portal connecting to active Render Database
+    const API_BASE = 'https://parking-system-11se.onrender.com/api';
     const form = document.getElementById('checkin-form');
     const errorDiv = document.getElementById('checkin-error');
     const successDiv = document.getElementById('checkin-success');
@@ -10,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         errorDiv.textContent = '';
         successDiv.textContent = '';
         
-        const slotId = document.getElementById('slot-id').value;
         const checkInCode = document.getElementById('checkin-code').value;
 
         btn.disabled = true;
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`${API_BASE}/staff/verify-checkin`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ slotId, checkInCode })
+                body: JSON.stringify({ checkInCode })
             });
             const data = await res.json();
 
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             errorDiv.textContent = 'Server connection failed.';
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Verify Access';
+            btn.textContent = 'Verify & Check-In';
         }
     });
 });
