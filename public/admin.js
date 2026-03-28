@@ -113,10 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const elapsedMins = (isActive && slot.bookingTime) ? Math.floor((Date.now() - slot.bookingTime) / 60000) : 0;
             const elapsedDisplay = (isActive && slot.bookingTime) ? `${elapsedMins}m` : '-';
             
-            // To test locally and gracefully demonstrate visually, duration in hours matches test minutes
-            const dynamicLimit = slot.durationHours ? slot.durationHours : 1;
+            // Standard time configuration: duration limit represents genuine hours
+            const dynamicLimitMins = (slot.durationHours ? slot.durationHours : 1) * 60;
             
-            const timeBadge = (isActive && elapsedMins >= dynamicLimit && slot.bookingTime) ? `<span style="color:#f85149; font-weight:bold;">${elapsedDisplay} (OVERDUE)</span>` : `<span class="null-data">${elapsedDisplay}</span>`;
+            const timeBadge = (isActive && elapsedMins >= dynamicLimitMins && slot.bookingTime) ? `<span style="color:#f85149; font-weight:bold;">${elapsedDisplay} (OVERDUE)</span>` : `<span class="null-data">${elapsedDisplay}</span>`;
 
             const formatArrival = (isActive && slot.arrivalTime) ? `<strong>${slot.arrivalTime}</strong>` : '';
             const formatDuration = (isActive && slot.durationHours) ? `(${slot.durationHours} Hr)` : '';

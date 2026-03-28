@@ -119,13 +119,30 @@ document.addEventListener('DOMContentLoaded', () => {
         otpModal.classList.remove('active');
     });
 
+    // Data Formatting & Validation
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+    });
+
+    const vehicleInput = document.getElementById('vehicle');
+    vehicleInput.addEventListener('input', (e) => {
+        let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        // Auto format like KL-01-CD-9676
+        if (val.length > 2 && val.length <= 4) val = val.substring(0,2)+'-'+val.substring(2);
+        else if (val.length > 4 && val.length <= 6) val = val.substring(0,2)+'-'+val.substring(2,4)+'-'+val.substring(4);
+        else if (val.length > 6) val = val.substring(0,2)+'-'+val.substring(2,4)+'-'+val.substring(4,6)+'-'+val.substring(6,10);
+        e.target.value = val;
+    });
+
     // Request OTP
     bookingForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const vehicleNumber = document.getElementById('vehicle').value;
+        // Anti-XSS & Trim
+        const name = document.getElementById('name').value.replace(/[<>"'&]/g, "").trim();
+        const phone = document.getElementById('phone').value.trim();
+        const vehicleNumber = document.getElementById('vehicle').value.replace(/[<>"'&]/g, "").trim();
         const arrivalTime = document.getElementById('arrival-time').value;
         const durationHours = document.getElementById('duration').value;
         

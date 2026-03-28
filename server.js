@@ -191,13 +191,12 @@ app.get('/api/admin/slots', (req, res) => {
 
 // Periodic background check for dynamic customized expiry limits
 setInterval(async () => {
-    // Note: To make local prototype testing viable, 1 selected 'Hour' = 1 Minute of real time checking here!
-    // Ex: Selecting '2 Hours' duration means the warning SMS sends after 2 real-life minutes.
     
     for (const slot of slots) {
         if ((slot.status === 'booked' || slot.status === 'occupied') && slot.bookingTime && !slot.warningSent) {
             
-            const durationMs = (slot.durationHours ? slot.durationHours : 1) * 60 * 1000; 
+            // Standard Time: 1 Hour = 3600000 ms
+            const durationMs = (slot.durationHours ? slot.durationHours : 1) * 60 * 60 * 1000; 
 
             if (Date.now() - slot.bookingTime > durationMs) {
                 slot.warningSent = true;
@@ -273,7 +272,7 @@ app.post('/api/staff/verify-checkin', (req, res) => {
 
     // 4. Mark official arrival
     slot.status = 'occupied';
-    slot.checkInCode = null; // Clear code so it can't be reused over and over
+    // Retaining checkInCode so it remains visible on Admin Dashboard. Re-use is safely blocked by status check.
 
     console.log(`[CUSTOMER CHECK-IN] Code verified! User assigned physically to Slot ${slot.id}.`);
     res.json({ 
